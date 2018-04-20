@@ -22,6 +22,7 @@ function searchProducts() {
   )
     .then(function (answer) {
       console.log(answer.purchase);
+
       connection.query("SELECT part_number, description, quantity, price FROM products WHERE ?", { part_number: answer.purchase }, function (err, res) {
         console.log(
           "Product: " +
@@ -31,33 +32,46 @@ function searchProducts() {
           " || price: " +
           res[0].price
         );
-        setAmount();
+        var customerChoice = res[0];
+
+        buyAmount(customerChoice);
       });
-      function setAmount() {
-        inquirer
-          .prompt({
-            name: "number",
-            type: "input",
-            message: "How many would you like to buy?",
-            validate: function (value) {
-              if (isNaN(value) === false) {
-                return true;
-              }
-              return false;
-            }
 
-          }).then(function (answer) {
-            console.log(answer.number);
-            connection.query("SELECT part_number quantity FROM products WHERE ?", { part_number: answer.purchase }, function (err, res) {
-              if (res.quantity < answer.number) {
-                console.log("Not enough in stock!");
-              } else {
-
-              }
-
-            });
-          });
-      }
     });
 }
+function buyAmount(customerChoice) {
+  inquirer
+    .prompt({
+      name: "number",
+      type: "input",
+      message: "How many would you like to buy?",
+      validate: function (value) {
+        if (isNaN(value) === false) {
+          return true;
+        }
+        return false;
+      }
 
+    }).then(function (answer) {
+      console.log(answer.number);
+      if (answer.number > customerChoice.quantity) {
+        console.log("Not enough in stock!");
+        buyAmount(customerChoice);
+      } else {
+        connection.query(
+          "UPDATE products SET ? WHERE ?",
+          [
+            {
+              quantity: (customerChoice.quantity - answer.number)
+            },
+            {
+              part_number: customerChoice.part_number
+            }
+          ], );
+          console.log("Purchase Made!")
+          searchProducts();
+      }
+      
+
+    });
+}
