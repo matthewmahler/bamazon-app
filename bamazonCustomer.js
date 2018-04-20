@@ -18,11 +18,9 @@ function searchProducts() {
       type: "input",
       message: "What item would you like to buy?"
     },
-
   )
     .then(function (answer) {
       console.log(answer.purchase);
-
       connection.query("SELECT part_number, description, quantity, price FROM products WHERE ?", { part_number: answer.purchase }, function (err, res) {
         console.log(
           "Product: " +
@@ -33,10 +31,8 @@ function searchProducts() {
           res[0].price
         );
         var customerChoice = res[0];
-
         buyAmount(customerChoice);
       });
-
     });
 }
 function buyAmount(customerChoice) {
@@ -51,7 +47,6 @@ function buyAmount(customerChoice) {
         }
         return false;
       }
-
     }).then(function (answer) {
       console.log(answer.number);
       if (answer.number > customerChoice.quantity) {
@@ -68,10 +63,9 @@ function buyAmount(customerChoice) {
               part_number: customerChoice.part_number
             }
           ], );
-          console.log("Purchase Made!")
-          searchProducts();
+        console.log("Purchase Made! \n")
+        console.log("Total Cost: $" + (customerChoice.price * answer.number))
+        searchProducts();
       }
-      
-
     });
 }
