@@ -9,9 +9,9 @@ var connection = mysql.createConnection({
 });
 connection.connect(function (err) {
   if (err) throw err;
-  run();
+  runManager();
 });
-function run() {
+function runManager() {
   inquirer
     .prompt({
       name: "action",
@@ -20,7 +20,7 @@ function run() {
       choices: [
         "View Products For Sale",
         "View Low Inventory",
-        "Add to Inventory",
+        "Add to Stock",
         "Add New Products",
 
       ]
@@ -52,7 +52,7 @@ function viewProducts() {
     for (var i = 0; i < res.length; i++) {
       console.log("SKU: " + res[i].part_number + " || Description: " + res[i].description + " || Stock: " + res[i].quantity);
     }
-    run();
+    runManager();
   });
 }
 
@@ -62,7 +62,7 @@ function viewLowInv() {
     for (var i = 0; i < res.length; i++) {
       console.log("SKU: " + res[i].part_number + " || Description: " + res[i].description + " || Stock: " + res[i].quantity);
     }
-    run();
+    runManager();
   });
 }
 
@@ -77,7 +77,7 @@ function addStock() {
       {
         name: "amount",
         type: "input",
-        message: "How many would you like to add? ",
+        message: "Enter New Quantity: ",
         validate: function (value) {
           if (isNaN(value) === false) {
             return true;
@@ -91,10 +91,67 @@ function addStock() {
       connection.query(query, [{ quantity: answer.amount }, { part_number: answer.item }],
         function (err) {
           if (err) throw err;
-          console.log("testing");
-          start();
-        })
+          console.log("... What did you do?");
+        });
+      console.log("Stock Updated \n")
 
-      run();
+      runManager();
     })
+}
+
+function addNewProducts() {
+  inquirer
+    .prompt([
+      {
+        name: "part_number",
+        type: "input",
+        message: "Enter SKU: "
+      },
+      {
+        name: "description",
+        type: "input",
+        message: "Enter Description: "
+      },
+      {
+        name: "upc_number",
+        type: "input",
+        message: "Enter UPC: ",
+        validate: function (value) {
+          if (isNaN(value) === false) {
+            return true;
+          }
+          return false;
+        }
+      },
+      {
+        name: "quantity",
+        type: "input",
+        message: "Enter Quantity: ",
+        validate: function (value) {
+          if (isNaN(value) === false) {
+            return true;
+          }
+          return false;
+        }
+      },
+      {
+        name: "department",
+        type: "input",
+        message: "Enter Department: "
+      },
+      {
+        name: "price",
+        type: "input",
+        message: "Enter Price: ",
+        validate: function (value) {
+          if (isNaN(value) === false) {
+            return true;
+          }
+          return false;
+        }
+      }
+    ]).then(function (answer){
+      console.log("testing");
+      runManager();
+    });
 }
