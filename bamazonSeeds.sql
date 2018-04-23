@@ -10,5 +10,5 @@ CREATE TABLE products (
   quantity INT NOT NULL,
   department VARCHAR(30) NOT NULL,
   price INT NOT NULL,
-  PRIMARY KEY (sku)
+  PRIMARY KEY (part_number)
 );

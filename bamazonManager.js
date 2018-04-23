@@ -22,7 +22,6 @@ function runManager() {
         "View Low Inventory",
         "Add to Stock",
         "Add New Products",
-
       ]
     })
     .then(function (answer) {
@@ -46,26 +45,23 @@ function runManager() {
     });
 }
 function viewProducts() {
-
   var query = "SELECT * FROM products";
   connection.query(query, function (err, res) {
     for (var i = 0; i < res.length; i++) {
-      console.log("SKU: " + res[i].part_number + " || Description: " + res[i].description + " || Stock: " + res[i].quantity);
+      console.log("SKU: " + res[i].part_number + " || Stock: " + res[i].quantity + " || Description: " + res[i].description);
     }
     runManager();
   });
 }
-
 function viewLowInv() {
   var query = "SELECT * FROM products WHERE quantity = ?";
   connection.query(query, "0", function (err, res) {
     for (var i = 0; i < res.length; i++) {
-      console.log("SKU: " + res[i].part_number + " || Description: " + res[i].description + " || Stock: " + res[i].quantity);
+      console.log("SKU: " + res[i].part_number + " || Stock: " + res[i].quantity + " || Description: " + res[i].description);
     }
     runManager();
   });
 }
-
 function addStock() {
   inquirer
     .prompt([
@@ -91,14 +87,11 @@ function addStock() {
       connection.query(query, [{ quantity: answer.amount }, { part_number: answer.item }],
         function (err) {
           if (err) throw err;
-          console.log("... What did you do?");
         });
       console.log("Stock Updated \n")
-
       runManager();
     })
 }
-
 function addNewProducts() {
   inquirer
     .prompt([
@@ -150,8 +143,22 @@ function addNewProducts() {
           return false;
         }
       }
-    ]).then(function (answer){
-      console.log("testing");
-      runManager();
+    ])  .then(function (answer) {
+      connection.query(
+        "INSERT INTO products SET ?",
+        {
+          part_number: answer.part_number,
+          description: answer.description,
+          upc_number: answer.upc_number,
+          quantity: answer.quantity,
+          department: answer.department,
+          price: answer.price
+        },
+        function (err) {
+          if (err) throw err;
+          console.log("Item Added");
+          runManager();
+        }
+      );
     });
 }
